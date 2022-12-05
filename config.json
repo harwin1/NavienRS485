@@ -1,0 +1,94 @@
+{
+  "name": "BESTIN WallPad with RS485",
+  "version": "2022.12.05",
+  "slug": "wallpad",
+  "description": "BESTIN WallPad for Home Assistant",
+  "arch": [
+    "armhf",
+    "armv7",
+    "aarch64",
+    "amd64",
+    "i386"
+  ],
+  "map": [
+    "share:rw"
+  ],
+  "url": "https://github.com/harwin1/bestinRS485",
+  "startup": "application",
+  "boot": "auto",
+  "uart": true,
+  "options": {
+    "sendDelay": 80,
+    "gapDelay": 30,
+    "retryCount": 20,
+    "energy_type": "socket",
+    "ctrl_type": "socket",
+    "smart_type": "serial",
+    "smart_enable": "off",
+    "serial": {
+      "energy_rpiPort": "/dev/ttyUSB0",
+      "energy_windowPort": "COM0",
+      "ctrl_rpiPort": "/dev/ttyUSB0",
+      "ctrl_windowPort": "COM0",
+      "recv_rpiPort": "/dev/ttyUSB0",
+      "recv_windowPort": "COM0",
+      "send_rpiPort": "/dev/ttyUSB0",
+      "send_windowPort": "COM0"
+    }, 
+    "socket": {
+      "energy_addr": "192.168.0.x",
+      "energy_port": 8899,
+      "ctrl_addr": "192.168.0.x",
+      "ctrl_port": 8899,
+      "recv_addr": "192.168.0.x",
+      "recv_port": 8899,
+      "send_addr": "192.168.0.x",
+      "send_port": 8899
+    },
+    "mqtt": {
+      "broker": "192.168.0.x",
+      "username": "id",
+      "password": "pw",
+      "port": 1883,
+      "receiveDelay": 5000,
+      "prefix": "homenet"
+    }
+  },
+  "schema": {
+    "sendDelay": "int",
+    "gapDelay": "int",
+    "retryCount": "int",
+    "energy_type": "list(serial|socket)",
+    "ctrl_type": "list(serial|socket)",
+    "smart_type": "list(serial|socket)",
+    "smart_enable": "list(on|off)",
+    "serial": {
+      "energy_rpiPort": "str?",      
+      "energy_windowPort": "str?",
+      "ctrl_rpiPort": "str?",
+      "ctrl_windowPort": "str?",
+      "recv_rpiPort": "str?",
+      "recv_windowPort": "str?",
+      "send_rpiPort": "str?",
+      "send_windowPort": "str?"
+    },
+    "socket": {
+      "energy_addr": "str?",
+      "energy_port": "int?",
+      "ctrl_addr": "str?",
+      "ctrl_port": "int?",
+      "recv_addr": "str?",
+      "recv_port": "int?",
+      "send_addr": "str?",
+      "send_port": "int?"
+    },
+    "mqtt": {
+      "broker": "str",
+      "username": "str",
+      "password": "str",
+      "port": "int",
+      "receiveDelay": "int",
+      "prefix": "str"
+    }
+  }
+}
