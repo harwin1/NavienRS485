@@ -44,14 +44,14 @@ const CONST = {
 
     // 기기별 상태 및 제어 코드(HEX)
     DEVICE_STATE: [
-        { deviceId: 'Light', subId: '1', stateHex: Buffer.alloc(8, '', 'hex'), power: 'OFF' },
-        { deviceId: 'Light', subId: '1', stateHex: Buffer.alloc(8, '', 'hex'), power: 'ON' },
-        { deviceId: 'Light', subId: '2', stateHex: Buffer.alloc(8, '', 'hex'), power: 'OFF' },
-        { deviceId: 'Light', subId: '2', stateHex: Buffer.alloc(8, '', 'hex'), power: 'ON' },
-        { deviceId: 'Light', subId: '3', stateHex: Buffer.alloc(8, '', 'hex'), power: 'OFF' },
-        { deviceId: 'Light', subId: '3', stateHex: Buffer.alloc(8, '', 'hex'), power: 'ON' },
-        { deviceId: 'Light', subId: '', stateHex: Buffer.alloc(8, '', 'hex'), alllight: 'OFF' },
-        { deviceId: 'Light', subId: '', stateHex: Buffer.alloc(8, '', 'hex'), alllight: 'ON' },  //일괄 점등/소등
+        { deviceId: 'Light', subId: '1', stateHex: Buffer.alloc(9, 'F70E11C10200002B04', 'hex'), power: 'OFF' },
+        { deviceId: 'Light', subId: '1', stateHex: Buffer.alloc(9, 'F70E11C10200012A04', 'hex'), power: 'ON' },
+        { deviceId: 'Light', subId: '2', stateHex: Buffer.alloc(9, 'F70E12C10200002802', 'hex'), power: 'OFF' },
+        { deviceId: 'Light', subId: '2', stateHex: Buffer.alloc(9, 'F70E12C10200012904', 'hex'), power: 'ON' },
+        { deviceId: 'Light', subId: '3', stateHex: Buffer.alloc(9, 'F70E12C10200002904', 'hex'), power: 'OFF' },
+        { deviceId: 'Light', subId: '3', stateHex: Buffer.alloc(9, 'F70E13C10200012804', 'hex'), power: 'ON' },
+        { deviceId: 'Light', subId: '', stateHex: Buffer.alloc(18, 'F70E1F0100E70CF70E1F810400000000630C', 'hex'), alllight: 'OFF' },
+        { deviceId: 'Light', subId: '', stateHex: Buffer.alloc(18, 'F70E1F0100E70CF70E1F810400000000630C', 'hex'), alllight: 'ON' },  //일괄 점등/소등
         //-> [조명] 5번째 바이트 하위 4바이트는: room_idx 6번째 바이트가 0x00: off/0x01: on
 
         { deviceId: 'Thermo', subId: '1', stateHex: Buffer.alloc(8, '', 'hex'), power: 'heat', setTemp: '', curTemp: '' },
@@ -106,9 +106,9 @@ const CONST = {
         { deviceId: 'Fan', subId: '1', commandHex: Buffer.alloc(8, 'F7320142010186F4', 'hex'), speed: 'low' }, //약(켜짐)
         { deviceId: 'Fan', subId: '1', commandHex: Buffer.alloc(8, 'F7320142010285F4', 'hex'), speed: 'mid' }, //중(켜짐)
         { deviceId: 'Fan', subId: '1', commandHex: Buffer.alloc(8, 'F7320142010384F4', 'hex'), speed: 'high' }, //강(켜짐)
-        //{ deviceId: 'Gas', subId: '1', commandHex: Buffer.alloc(8, '', 'hex'), power: 'OFF' },
-        //{ deviceId: 'Gas', subId: '1', commandHex: Buffer.alloc(8, '', 'hex'), power: 'ON' },
-        //{ deviceId: 'Gas', subId: '1', commandHex: Buffer.alloc(8, '', 'hex'), power: 'ON' } // moving
+
+        { deviceId: 'Gas', subId: '1', commandHex: Buffer.alloc(8, 'F71201410100A4F0', 'hex'), power: 'OFF' },
+        { deviceId: 'Gas', subId: '1', commandHex: Buffer.alloc(9, 'F712018102000463F4', 'hex'), power: 'ON' },
 ],
 
     // 상태 Topic (/homenet/${deviceId}${subId}/${property}/state/ = ${value})
@@ -143,8 +143,14 @@ CustomParser.prototype._transform = function (chunk, encoding, done) {
         // 메시지 종류에 따른 메시지 길이 파악
         else if (this._msgTypeFlag) {
             switch (chunk[i]) {
-                case 0x02: case 0x32: case 0x36: 
-                    this._msgLength = 8; break;
+                case 0x36: case 0x11: case 0x44: case 0x12: case 0x01: case 0x41: case 0x1f: case 0x43: case 0x0e: case 0x42:
+                    this._msgLength = 8; break;  //난방,가스,조명 상태/명령
+                case 0x0e: case 0x1f: case 0x81:
+                    this._msgLength = 11; break;  //조명 상태
+                case 0x0e: case 0x1f: case 0x01:
+                    this._msgLength = 18; break;  //조명 상태/쿼리
+                case 0x12: case 0x01: case 0x81:
+                    this._msgLength = 9; break;  //가스 명령
                 default:
                     this._msgLength = 8;
             }
@@ -221,25 +227,27 @@ parser.on('data', function (data) {
     //console.log('Receive interval: ', (new Date().getTime())-lastReceive, 'ms ->', data.toString('hex'));
     lastReceive = new Date().getTime();
 
-    switch (data[0]) {
-        case 0x00: case 0x00: case 0x00:
+    switch (data[3]) {
+        case 0x81: case 0xc1:
             var objFound = CONST.DEVICE_STATE.find(obj => data.equals(obj.stateHex));
             if (objFound)
                 updateStatus(objFound);
             break;
         
-        case 0x00: // 온도조절기 상태 정보
+        case 0x44: // 온도조절기 상태 정보
             var objFound = CONST.DEVICE_STATE.find(obj => data.includes(obj.stateHex)); // 메시지 앞부분 매칭(온도부분 제외)
             if (objFound) {
-                objFound.curTemp = data[0].toString(16); // 현재 온도
-                objFound.setTemp = data[0].toString(16); // 설정 온도
+                objFound.curTemp = data[5].toString(10); // 현재 온도
+                objFound.setTemp = (data[6] / 10.0).toString(10); // 설정 온도
                 updateStatus(objFound);
             }
             break;
+    }
         
-        case 0x00: // 제어 명령 Ack 메시지 
+    switch (data[4]) {
+        case 0x01: case 0x02:
             const ack = Buffer.alloc(1);
-            data.copy(ack, 0, 1, 2);
+            data.copy(ack, 0, 1, 4);
             var objFoundIdx = queue.findIndex(obj => obj.commandHex.includes(ack));
             if (objFoundIdx > -1) {
                 log('Success command:', data.toString('hex'));
