@@ -1,0 +1,114 @@
+switch:
+- name: "light_1"
+  command_topic: "homenet/Light1/power/command"
+  state_topic: "homenet/Light1/power/state"
+  icon: mdi:lightbulb
+- name: "light_2"
+  command_topic: "homenet/light2/power/command"
+  state_topic: "homenet/light2/power/state"
+  icon: mdi:lightbulb
+- name: "light_3"
+  command_topic: "homenet/light3/power/command"
+  state_topic: "homenet/light3/power/state"
+  icon: mdi:lightbulb
+- name: "light_all"
+  command_topic: "homenet/Light/alllight/command"
+  state_topic: "homenet/Light/alllight/state"
+  icon: mdi:lightbulb
+- name: "gas"
+  command_topic: "homenet/Gas1/power/command"
+  state_topic: "homenet/Gas1/power/state"
+  icon: mdi:gas-cylinder
+  
+climate:
+- name: "thermostat_1"
+  mode_state_topic: "homenet/Thermo1/power/state"
+  mode_command_topic: "homenet/Thermo1/power/command"
+  temperature_state_topic: "homenet/Thermo1/setTemp/state"
+  temperature_command_topic: "homenet/Thermo1/setTemp/command"
+  current_temperature_topic: "homenet/Thermo1/curTemp/state"
+  modes:
+  - "off"
+  - "heat"
+  min_temp: 5
+  max_temp: 40
+  precision: 0.1
+- name: "thermostat_2"
+  mode_state_topic: "homenet/Thermo2/power/state"
+  mode_command_topic: "homenet/Thermo2/power/command"
+  temperature_state_topic: "homenet/Thermo2/setTemp/state"
+  temperature_command_topic: "homenet/Thermo2/setTemp/command"
+  current_temperature_topic: "homenet/Thermo2/curTemp/state"
+  modes:
+  - "off"
+  - "heat"
+  min_temp: 5
+  max_temp: 40
+  precision: 0.1
+- name: "thermostat_3"
+  mode_state_topic: "homenet/Thermo3/power/state"
+  mode_command_topic: "homenet/Thermo3/power/command"
+  temperature_state_topic: "homenet/Thermo3/setTemp/state"
+  temperature_command_topic: "homenet/Thermo3/setTemp/command"
+  current_temperature_topic: "homenet/Thermo3/curTemp/state"
+  modes:
+  - "off"
+  - "heat"
+  min_temp: 5
+  max_temp: 40
+  precision: 0.1
+- name: "thermostat_4"
+  mode_state_topic: "homenet/Thermo4/power/state"
+  mode_command_topic: "homenet/Thermo4/power/command"
+  temperature_state_topic: "homenet/Thermo4/setTemp/state"
+  temperature_command_topic: "homenet/Thermo4/setTemp/command"
+  current_temperature_topic: "homenet/Thermo4/curTemp/state"
+  modes:
+  - "off"
+  - "heat"
+  min_temp: 5
+  max_temp: 40
+  precision: 0.1
+- name: "thermostat_all"
+  mode_state_topic: "homenet/Thermo5/allthermo/state"
+  mode_command_topic: "homenet/Thermo5/allthermo/command"
+  modes:
+  - "off"
+  - "heat"
+  min_temp: 5
+  max_temp: 40
+  precision: 0.1
+  
+fan:
+- name: "fan"
+  state_topic: "homenet/Fan1/power/state"
+  command_topic: "homenet/Fan1/power/command"
+  preset_mode_command_topic: "homenet/Fan1/speed/command"
+  preset_mode_command_template: >
+    {% if value == 'low' %}
+      low
+    {% elif value == 'mid' %}
+      medium
+    {% elif value == 'high' %}
+      high
+    {% else %}
+      off 
+    {% endif %}
+  preset_mode_state_topic: "homenet/Fan1/speed/state"
+  preset_mode_value_template: >
+    {% if value_json.FanSpeed == low %}
+      low
+    {% elif value_json.FanSpeed == mid %}
+      medium
+    {% elif value_json.FanSpeed == high %}
+      high
+    {% else %}
+      off
+    {% endif %}
+  preset_modes:
+    - 'low'
+    - 'mid'
+    - 'high'
+
+
+    
