@@ -213,8 +213,8 @@ if (rs485Var.type == 'serial') {
 } else {
     log('Initializing: SOCKET');
     rs485 = new net.Socket();
-    rs485.connect(rs485Var.port, rs485Var.addr, function () {
-        log('INFO   Success connected to server', "(" + rs485Var.addr, rs485Var.port + ")");
+    rs485.connect(rs485Var.sock_port, rs485Var.sock_addr, function () {
+        log('INFO   Success connected to server', "(" + rs485Var.sock_addr, rs485Var.sock_port + ")");
     });
     rs485.on('error', (err) => {
         log('ERROR   server connection failed:', err.message)
