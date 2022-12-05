@@ -229,7 +229,7 @@ parser.on('data', function (data) {
 
     switch (data[3]) {
         case 0x81: case 0xc1:
-            var objFound = CONST.DEVICE_STATE.find(obj => data.equals(obj.stateHex));
+            var objFound = CONST.DEVICE_STATE.find(obj => data.includes(obj.stateHex));
             if (objFound)
                 updateStatus(objFound);
             break;
