@@ -51,7 +51,7 @@
       "broker": "str",
       "username": "str",
       "password": "str",
-      "port": "str",
+      "port": "int",
       "receiveDelay": "int"
     }
   }
